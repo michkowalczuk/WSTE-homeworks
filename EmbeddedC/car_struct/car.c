@@ -27,7 +27,7 @@ int randRange(int min, int max)
         : (int)((double)rand() / (RAND_MAX + 1) * (max - min + 1) + min));
 }
 
-/* fill cars arrayle with random cars */
+/* fill cars array with random cars */
 void generateCars(Car cars[])
 {
     printf("Generating %d cars... ", N);
@@ -70,7 +70,7 @@ void showCars(Car cars[], int carOrder[])
 void bubbleSort(int array[], int orderArray[])
 {
     // fill orderArray from 0 to n
-    for (int i = 0; i < N; orderArray[i] = i++);
+    resetOrder(orderArray);
     // we need at most (n - 1) loops
     int i = 0, swapped, tmp;
     do
@@ -120,7 +120,7 @@ void sortCars(Car cars[], int carOrder[], Member member)
                 tmp = cars[i].equipment;
                 break;
             default:
-                tmp = 0;
+                tmp = i;
                 break;
         }
         memberArray[i] = tmp;
