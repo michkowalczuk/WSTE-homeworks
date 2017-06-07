@@ -1,6 +1,6 @@
 /*
 @author Michał Kowalczuk
-@version 2017-04-11
+@version 2017-05-08
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,10 +34,10 @@ void generateCars(Car cars[])
     for (int i = 0; i < N; i++)
     {
         cars[i] = (Car){
-            .weight = randRange(500, 1500),
-            .price = randRange(20000, 30000),
-            .color = rand() % 4 + 1,
-            .equipment = rand() % 3 + 1,
+            .weight = randRange(WEIGHT_MIN, WEIGHT_MAX),
+            .price = randRange(PRICE_MIN, PRICE_MAX),
+            .color = rand() % NO_COLORS + 1,
+            .equipment = rand() % NO_EQUIPMENTS + 1,
         };
     }
     printf("done!\n");

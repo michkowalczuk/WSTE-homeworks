@@ -1,14 +1,16 @@
 /*
 @author Michał Kowalczuk
-@version 2017-04-11
+@version 2017-05-08
 */
 #ifndef CAR_H
 #define CAR_H
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#define N 10
+#define WEIGHT_MIN 500
+#define WEIGHT_MAX 1500
+#define PRICE_MIN 20000
+#define PRICE_MAX 30000
+#define NO_COLORS 4
+#define NO_EQUIPMENTS 3
 #define LENGTH(arr) (sizeof(arr) / sizeof (arr[0]))
 
 typedef enum Member {WEIGHT=1, PRICE, COLOR, EQUIPMENT} Member;
