@@ -30,7 +30,6 @@ TILE_SIZE = 40
 MARGIN_X = 40
 MARGIN_Y = 40
 
-
 TILE_X = [i * TILE_SIZE + MARGIN_X for i in range(10)]
 TILE_Y = [i * TILE_SIZE + MARGIN_Y for i in range(10)]
 
@@ -61,7 +60,7 @@ class Tile(pygame.sprite.Sprite):
         self.index = index
         # self.player = player
         self.isMouseover = False
-        # self.type = TileType.NONE
+        self.type = TileType.NONE
 
     # @property
     # def i(self):
@@ -76,15 +75,29 @@ class Tile(pygame.sprite.Sprite):
         if self.isMouseover:
             self.image.fill(RED)
         else:
-            if Tile.player.board[self.index[1], self.index[0]] in range(1,5):
+            # if Tile.player.board[self.index[1], self.index[0]] in range(1,5):
+            if tile.type == 0:
+                self.image.fill(WHITE)
+            elif tile.type in range(1,5):
                 self.image.fill(BLUE)
+                # Tile.player.board[self.index[1], self.index[0]] in range(1,5):
+                # self.image.fill(BLUE)
             else:
                 self.image.fill(WHITE)
+
+    def draw(self, surf):
+        surf.blit(self.image, self.rect)
 
 
 class Player(object):
     def __init__(self):
         self.board = np.zeros((10,10))
+        self.tiles = []
+        for i, x in enumerate(TILE_X):
+            for j, y in enumerate(TILE_Y):
+                tile = Tile((i, j), (x, y), all_sprites)  # to delete all_sprites
+                self.tiles.append(tile)
+                all_sprites.add(tile)
 
     def mast_count(self, n):
         return int(np.count_nonzero(self.board == n) / n)
@@ -94,8 +107,10 @@ class Player(object):
         # return (self.mast_count(5) == 0 )
         return all([(self.mast_count(i) == 5 - i) for i in range(1,5)])
 
-    def setShip(self, n, index):
-        self.board[index[1], index[0]] = n
+    def set_ship(self, n, index):
+        i, j = index[0], index[1]
+        self.board[j, i] = n
+        self.tiles[i * 10 + j].type = n
 
 
 def draw_text(surf, text, size, x, y, align=TextAlign.CENTER):
@@ -114,29 +129,29 @@ def draw_text(surf, text, size, x, y, align=TextAlign.CENTER):
         text_rect.topright = (x, y)
     surf.blit(text_surface, text_rect)
 
-def draw_board(surf, offset=0):
-    for i, x in TILE_X:
-        for y in TILE_Y:
-            draw_tile(surf, x + offset, y)
+# def draw_board(surf, offset=0):
+#     for i, x in TILE_X:
+#         for y in TILE_Y:
+#             draw_tile(surf, x + offset, y)
+#
+#     for i, x in enumerate(TILE_X):
+#         draw_text(surf, chr(65 + i), FONT_SIZE, x + TILE_SIZE/2 + offset, MARGIN_Y - TILE_SIZE/2)
+#
+#     for i, y in enumerate(TILE_Y):
+#         draw_text(surf, str(i + 1), FONT_SIZE, MARGIN_X - TILE_SIZE/2 + offset, y + TILE_SIZE/2)
+#
+# def draw_tile(surf, x, y):
+#     tile_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
+#     pygame.draw.rect(surf, WHITE, tile_rect)
+#     pygame.draw.rect(surf, BLUE, tile_rect, 1)
 
-    for i, x in enumerate(TILE_X):
-        draw_text(surf, chr(65 + i), FONT_SIZE, x + TILE_SIZE/2 + offset, MARGIN_Y - TILE_SIZE/2)
-
-    for i, y in enumerate(TILE_Y):
-        draw_text(surf, str(i + 1), FONT_SIZE, MARGIN_X - TILE_SIZE/2 + offset, y + TILE_SIZE/2)
-
-def draw_tile(surf, x, y):
-    tile_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
-    pygame.draw.rect(surf, WHITE, tile_rect)
-    pygame.draw.rect(surf, BLUE, tile_rect, 1)
-
-
-def draw_horizontal_line(surf, x):
-    pygame.draw.line(surf, BLUE, (x, TILE_Y[0]), (x, TILE_Y[-1] + TILE_SIZE))
-
-
-def draw_vertical_line(surf, x):
-    pygame.draw.line(surf, BLUE, (x, TILE_Y[0]),(x, TILE_Y[-1]))
+#
+# def draw_horizontal_line(surf, x):
+#     pygame.draw.line(surf, BLUE, (x, TILE_Y[0]), (x, TILE_Y[-1] + TILE_SIZE))
+#
+#
+# def draw_vertical_line(surf, x):
+#     pygame.draw.line(surf, BLUE, (x, TILE_Y[0]),(x, TILE_Y[-1]))
 
 
 # INITIALIZE PYGAME AND CREATE WINDOW
@@ -149,14 +164,15 @@ clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 # tile = Tile(all_sprites)
 
-
-for i, x in enumerate(TILE_X):
-    for j, y in enumerate(TILE_Y):
-        tile = Tile((i,j), (x, y), all_sprites)
-        all_sprites.add(tile)
+# tiles = []
+# for i, x in enumerate(TILE_X):
+#     for j, y in enumerate(TILE_Y):
+#         tile = Tile((i,j), (x, y), all_sprites)
+#         tiles.append(tile)
+#         all_sprites.add(tile)
 
 player = Player()
-Tile.player = player
+# Tile.player = player
 
 # GAME LOOP
 # instructions = True
@@ -203,8 +219,10 @@ while running:
 
     # DRAW / RENDER
     screen.fill(GREY)
-    all_sprites.draw(screen)
 
+    all_sprites.draw(screen)
+    # for tile in player.tiles:
+    #     tile.draw(screen)
     # draw_board_lines(screen, )
 
     # draw_board(screen)  # player's board
@@ -229,7 +247,7 @@ while running:
             if player.mast_count(i) != 5 - i:
                 instructions.append("{} x {}-maszt".format((5 - i) - player.mast_count(i), i))
                 if mouseClicked:
-                    player.setShip(i, clickedTileIndex)
+                    player.set_ship(i, clickedTileIndex)
                     # print(player.board)
                 break
         for i, instruction in enumerate(instructions):
